@@ -2,7 +2,6 @@
 import './style.css'
 import { useState } from "react";
 
-import instruction from "./prompt";
 import useOpenAI from "./useOpenAI";
 
 const countries_region = ["Afghanistan", "Aland Islands", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antartica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde",  "Caribbean Netherlands", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos(Keeling) Island", "Colombia", "Comoros", "Congo-Brazzaville", "Congo-Kinshasa", "Cook Islands", "Costa Rica", "Cote d'Ivoire", "Croatia", "Curacao", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", 
@@ -32,8 +31,7 @@ const payment_volume = [
 export default function Page() {
   const getCompletion = useOpenAI();
 
-  const [prompt, setPrompt] = useState('');
-  const [formData, setFormData] = useState({
+  const initial = {
     work_email: '',
     country_region: '',
     payment_volume: '',
@@ -45,7 +43,9 @@ export default function Page() {
     job_function: '',
     job_level: '',
     anything_else: '',
-  });
+  };
+  const [prompt, setPrompt] = useState('');
+  const [formData, setFormData] = useState(initial);
 
   // Handle changes to any input field
   const handleChange = (e:any) => {
@@ -63,6 +63,8 @@ export default function Page() {
     // Send formData or log it
     console.log("Form submitted:", formData);
     alert('form submitted')
+    setFormData(initial)
+    setPrompt('')
   };
 
 
@@ -75,8 +77,11 @@ export default function Page() {
         loading: true
       }))
 
-      const newMessage = `${instruction}. message:${prompt}`
-      const result = await getCompletion(newMessage);
+      if (prompt.length < 5){
+        return ;
+      }
+
+      const result = await getCompletion(prompt);
       
       if (result.error){
         return console.log('an error occured')
@@ -364,7 +369,7 @@ export default function Page() {
 
                 <div className="flex justify-between font-semibold pt-6">
                     <button type="button">Back</button>
-                    <button type="submit" className="px-3 py-1.5 bg-[#635bff] text-white rounded-full">Submit</button>
+                    <button type="submit" disabled={status.loading?true:false } className="px-3 py-1.5 bg-[#635bff] text-white rounded-full">Submit</button>
                 </div>
   
                 <p className="text-xs text-gray-500 text-center">

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import instruction from '@/app/prompt';
 
 const API_KEY = process.env.API_KEY || ''; // Ensure your API key is stored in an environment variable
 
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
       model: "gpt-4o-mini",
       messages: [
         { role: 'system', content: 'follow the instruction provided by the user' },
-        { role: 'user', content: prompt }
+        { role: 'user', content: `${instruction}. message:${prompt}`}
       ]
     });
 
